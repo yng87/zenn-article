@@ -1,14 +1,13 @@
 ---
-title: "CatBoost の feature importance"
+title: "TFRSで2-stageレコメンドシステムを実装する"
 emoji: "🐈" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア記事
 topics: ["機械学習"] # タグ。["markdown", "rust", "aws"]のように指定する
 published: false # 公開設定（falseにすると下書き）
 ---
 
-少し前に、Tensorflow Recommenders (TFRS) というライブラリがリリースされていました。これは、Keras を使用してレコメンドシステムを作るためのモジュール群のようです。
+少し前に、[Tensorflow Recommenders (TFRS)](https://www.tensorflow.org/recommenders) というライブラリがリリースされていました。これは、Keras を使用してレコメンドシステムを作るためのモジュール群のようです。
 
-[https://www.tensorflow.org/recommenders:embed:cite]
 
 近年は深層学習を用いたレコメンドシステムが実応用されるようになってきました。特に、YouTube に代表されるような大規模なプロダクトでは、2-stage レコメンドと呼ばれる形での利用がスタンダードになっています((https://static.googleusercontent.com/media/research.google.com/ja//pubs/archive/45530.pdf))。このTFRSは、2-stage レコメンドシステムを念頭に作られているようです。
 
@@ -237,11 +236,8 @@ class MovielensRetrievalModel(tfrs.models.Model):
 
 ここのロスの説明がチュートリアルにはないので、少し調べる必要がありました((例えば [この論文](https://dl.acm.org/doi/10.1145/3298689.3346996)の3章など))。正式名称があるのかわかりませんが in-batch softmax などど呼ばれているようです。
 ミニバッチの各サンプル `(query, candidate)` について、query に対応する candidate が正解クラス、それ以外のミニバッチ内の candidate が不正解クラスになります。式で書くと
-<div>[tex:
-P(y_i|x_i) = \frac{\exp(x_i^Ty_i)}{\sum_j \exp(x_i^Ty_j)} \\
-L = -\frac{1}{|B|} \sum_{i\in B} \log P(x_i|y_i)
-]</div>
-となります。[ソースコード](https://github.com/tensorflow/recommenders/blob/v0.3.0/tensorflow_recommenders/tasks/retrieval.py#L89-L161)を読むと多分こんな感じに（デフォルトでは）なっています。x, y はそれぞれ query と candidate のそれぞれの tower を通した後の embedding ベクトルです。関連のある query と candidate のコサイン類似度が高くなるように学習します。
+$$P(y_i|x_i) = \frac{\exp(x_i^Ty_i)}{\sum_j \exp(x_i^Ty_j)}\,,L = -\frac{1}{|B|} \sum_{i\in B} \log P(x_i|y_i)$$
+となります。[ソースコード](https://github.com/tensorflow/recommenders/blob/v0.3.0/tensorflow_recommenders/tasks/retrieval.py#L89-L161)を読むと多分こんな感じに（デフォルトでは）なっています。$x_i$, $y_i$ はそれぞれ query と candidate のそれぞれの tower を通した後の embedding ベクトルです。関連のある query と candidate のコサイン類似度が高くなるように学習します。
 
 
 
