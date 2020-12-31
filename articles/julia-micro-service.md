@@ -248,7 +248,7 @@ end # module
 using Papers
 Resource.run()
 ```
-そして次のように Dockerfile を書きます:
+そして次のように Dockerfile を書きます。ディレクトリの構成は[リポジトリ](https://github.com/yng87/Papers)を見てください。
 ```dockerfile:Dockerfile
 FROM julia:1.5.3
 
